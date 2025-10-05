@@ -1,22 +1,16 @@
-import { loadEnv } from 'vite'
-import { InlineConfig } from 'vitest'
-import { fileURLToPath } from 'node:url'
+import type { UserConfig } from 'vitest'
 
-export const createVitestTestConfig = (testingType: string): InlineConfig => {
+import { loadEnv } from 'vite'
+
+export type TestConfig = NonNullable<UserConfig['test']>
+
+export const createVitestTestConfig = (testingType: string): TestConfig => {
 	return {
-		root: './',
 		globals: true,
 		isolate: false,
 		passWithNoTests: true,
 		include: [`tests/${testingType}/**/*.test.ts`],
 		env: loadEnv('test', process.cwd(), ''),
-		resolve: {
-			alias: {
-				'@nestjs-redis/kit': fileURLToPath(
-					new URL('./tests/utils/redis-kit.stub.ts', import.meta.url),
-				),
-			},
-		},
 		coverage: {
 			provider: 'istanbul',
 			reporter: ['text', 'json', 'html'],
