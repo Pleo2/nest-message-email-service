@@ -5,7 +5,7 @@
 <h1 align="center">⭐ NestJS Service Template ⭐</h1>
 
 <p align="center">
-  Template for new services based on NestJS with the Best Practices and Ready for Production
+  Nest Js Message For Otp with Mail and SMS
 </p>
 
 <p align="center">
@@ -21,23 +21,43 @@
 
 ## 🌟 What is including this template?
 
-1. 🐳 Fully dockerized service ready for development and production environments with the best practices for docker, trying to provide a performance and small image just with the code we really need in your environments.
-2. 👷 Use [SWC](https://swc.rs/) for compiling and running the tests of the service. As commented in the own [NestJS docs](https://docs.nestjs.com/recipes/swc), this is approximately x20 times faster than default typescript compiler that is the one that comes by default in NestJS.
-3. ⚡️ Use [Fastify](https://fastify.dev/) as Web Framework. By default, [NestJS is using Express](https://docs.nestjs.com/techniques/performance) because is the most widely-used framework for working with NodeJS, however, this does not imply is the one is going to give us the most performance. Also, NestJS is fully compatible with Fastify, so we are providing this integration by default. You can check [here](https://github.com/fastify/benchmarks#benchmarks) comparison between different web frameworks [comparativa de express](https://betterstack.com/community/guides/scaling-nodejs/fastify-express/).
+1. 🐳 Fully dockerized service ready for development and production environments with the best practices for docker,
+   trying to provide a performance and small image just with the code we really need in your environments.
+2. 👷 Use [SWC](https://swc.rs/) for compiling and running the tests of the service. As commented in the
+   own [NestJS docs](https://docs.nestjs.com/recipes/swc), this is approximately x20 times faster than default
+   typescript compiler that is the one that comes by default in NestJS.
+3. ⚡️ Use [Fastify](https://fastify.dev/) as Web Framework. By
+   default, [NestJS is using Express](https://docs.nestjs.com/techniques/performance) because is the most widely-used
+   framework for working with NodeJS, however, this does not imply is the one is going to give us the most performance.
+   Also, NestJS is fully compatible with Fastify, so we are providing this integration by default. You can
+   check [here](https://github.com/fastify/benchmarks#benchmarks) comparison between different web
+   frameworks [comparativa de express](https://betterstack.com/community/guides/scaling-nodejs/fastify-express/).
 
-4. 🐶 Integration with [husky](https://typicode.github.io/husky/) to ensure we have good quality and conventions while we are developing like:
-    - 💅 Running the linter over the files that have been changed
-    - 💬 Use [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) to ensure our commits have a convention.
-    - ✅ Run the tests automatically.
-    - ⚙️ Check our project does not have type errors with Typescript.
-    - 🙊 Check typos to ensure we don't have grammar mistakes.
-5. 🗂️ Separate tests over production code. By default, NestJS is combining in the same folder, the `src`, the unit tests and the code we are developing for production. This is something I personally don't like so here I am separating this and having a dedicated folder for the unit tests.
-6. 🧪 Testing with [Vitest](https://vitest.dev/) and [supertest](https://github.com/ladjs/supertest) for unit and e2e tests.
-8. 🤜🤛 Combine unit and e2e test coverage. In the services we may have both type of tests, unit and e2e tests, and usually we would like to see what is the combined test coverage, so we can see the full picture.
-9. 📌 Custom path aliases, where you can define your own paths (you will be able to use imports like `@/shared/logger` instead of `../../../src/shared/logger`).
-11. 🐦‍🔥 Usage of ESModules instead of CommonJS, which is the standard in JavaScript.
-12. 📦 Use of [pnpm](https://pnpm.io/) as package manager, which is faster and more efficient than npm or yarn.
-13. 🔑 Environment variable validation with [Joi](https://github.com/hapijs/joi). How does it work in your code? In app.module.ts, you import ConfigModule.forRoot and pass your Joi validationSchema. When the app starts, NestJS validates the environment variables using that schema. If any required variable is missing or there is an invalid value, the app will not start and will show you an error.
+4. 🐶 Integration with [husky](https://typicode.github.io/husky/) to ensure we have good quality and conventions while we
+   are developing like:
+
+- 💅 Running the linter over the files that have been changed
+- 💬 Use [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) to ensure our commits have a
+  convention.
+- ✅ Run the tests automatically.
+- ⚙️ Check our project does not have type errors with Typescript.
+- 🙊 Check typos to ensure we don't have grammar mistakes.
+
+5. 🗂️ Separate tests over production code. By default, NestJS is combining in the same folder, the `src`, the unit tests
+   and the code we are developing for production. This is something I personally don't like so here I am separating this
+   and having a dedicated folder for the unit tests.
+6. 🧪 Testing with [Vitest](https://vitest.dev/) and [supertest](https://github.com/ladjs/supertest) for unit and e2e
+   tests.
+7. 🤜🤛 Combine unit and e2e test coverage. In the services we may have both type of tests, unit and e2e tests, and
+   usually we would like to see what is the combined test coverage, so we can see the full picture.
+8. 📌 Custom path aliases, where you can define your own paths (you will be able to use imports like `@/shared/logger`
+   instead of `../../../src/shared/logger`).
+9. 🐦‍🔥 Usage of ESModules instead of CommonJS, which is the standard in JavaScript.
+10. 📦 Use of [pnpm](https://pnpm.io/) as package manager, which is faster and more efficient than npm or yarn.
+11. 🔑 Environment variable validation with [Joi](https://github.com/hapijs/joi). How does it work in your code? In
+    app.module.ts, you import ConfigModule.forRoot and pass your Joi validationSchema. When the app starts, NestJS
+    validates the environment variables using that schema. If any required variable is missing or there is an invalid
+    value, the app will not start and will show you an error.
 
 ## 🧑‍💻 Developing
 
@@ -59,9 +79,11 @@ The project is fully dockerized 🐳, if we want to start the app in **developme
 docker-compose up -d my-service-dev
 ```
 
-This development mode will work with **hot-reload** and expose a **debug port**, port `9229`, so later we can connect to it from our editor.
+This development mode will work with **hot-reload** and expose a **debug port**, port `9229`, so later we can connect to
+it from our editor.
 
-Now, you should be able to start debugging configuring using your IDE. For example, if you are using vscode, you can create a `.vscode/launch.json` file with the following configuration:
+Now, you should be able to start debugging configuring using your IDE. For example, if you are using vscode, you can
+create a `.vscode/launch.json` file with the following configuration:
 
 ```json
 {
