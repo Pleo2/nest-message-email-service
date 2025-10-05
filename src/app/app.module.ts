@@ -7,13 +7,14 @@ import { LoggerModule } from '@/shared/logger/logger.module'
 
 import { UserModule } from '@/contexts/users/user.module'
 
-import { validationSchema } from '../config/env-validator.schema'
+import { validate } from '../common/env.validation'
+
 @Module({
 	imports: [
 		ConfigModule.forRoot({
 			isGlobal: true,
-			envFilePath: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
-			validationSchema: validationSchema,
+			envFilePath: ['.env'],
+			validate,
 			validationOptions: {
 				abortEarly: false,
 				allowUnknown: true,
