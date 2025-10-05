@@ -2,15 +2,17 @@ import type { UserConfig } from 'vitest'
 
 import { loadEnv } from 'vite'
 
-export type TestConfig = NonNullable<UserConfig['test']>
-
-export const createVitestTestConfig = (testingType: string): TestConfig => {
+export const createVitestTestConfig = (testingType: string): UserConfig => {
+	const loaded = loadEnv('test', process.cwd(), '')
 	return {
 		globals: true,
 		isolate: false,
 		passWithNoTests: true,
 		include: [`tests/${testingType}/**/*.test.ts`],
-		env: loadEnv('test', process.cwd(), ''),
+		env: {
+			...loaded,
+			NODE_ENV: 'test',
+		},
 		coverage: {
 			provider: 'istanbul',
 			reporter: ['text', 'json', 'html'],

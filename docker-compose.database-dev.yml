@@ -9,11 +9,16 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
       POSTGRES_DB: ${DB_NAME:-nestjs_app}
     ports:
-      - "${DB_PORT:-5432}:5432"
+      - '${DB_PORT:-5432}:5432'
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:
       - backend
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${DB_USERNAME:-postgres}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:7.4-alpine
@@ -21,22 +26,27 @@ services:
     restart: unless-stopped
     env_file: .env
     ports:
-      - "${REDIS_PORT:-6379}:6379"
+      - '${REDIS_PORT:-6379}:6379'
+    # Opción 1: Sin password (desarrollo)
     command: >
       redis-server
-      --requirepass ${REDIS_PASSWORD}
       --appendonly yes
       --appendfsync everysec
       --save 900 1
       --save 300 10
       --save 60 10000
-      --loglevel ${REDIS_LOG_LEVEL:-warning}
-      --maxmemory ${REDIS_MAX_MEMORY:-256mb}
+      --loglevel warning
+      --maxmemory 256mb
       --maxmemory-policy allkeys-lru
     volumes:
       - redis_data:/data
     networks:
       - backend
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   pgdata:
@@ -45,4 +55,3 @@ volumes:
 networks:
   backend:
     driver: bridge
-

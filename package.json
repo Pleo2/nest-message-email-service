@@ -41,7 +41,10 @@
 		"build:clean": "rimraf dist; exit 0",
 		"typos": "chmod +x scripts/check_typos.sh && ./scripts/check_typos.sh",
 		"compose:database:dev:up": "docker-compose -f docker-compose.database-dev.yml up -d",
-		"compose:database:dev:down": "docker-compose -f docker-compose.database-dev.yml down"
+		"compose:database:dev:down": "docker-compose -f docker-compose.database-dev.yml down",
+		"db:generate": "typeorm migration:generate -d src/data-source.ts",
+		"db:run": "typeorm migration:run -d src/data-source.ts",
+		"db:revert": "typeorm migration:revert -d src/data-source.ts"
 	},
 	"dependencies": {
 		"@fastify/static": "^8.2.0",
@@ -51,7 +54,10 @@
 		"@nestjs/config": "^4.0.2",
 		"@nestjs/core": "^11.1.2",
 		"@nestjs/platform-fastify": "^11.1.2",
+		"@nestjs/schedule": "^6.0.1",
+		"@nestjs/throttler": "^6.4.0",
 		"@nestjs/typeorm": "^11.0.0",
+		"bcrypt": "^6.0.0",
 		"class-transformer": "^0.5.1",
 		"class-validator": "^0.14.2",
 		"dotenv": "^16.5.0",
@@ -72,6 +78,7 @@
 		"@nestjs/testing": "^10.4.6",
 		"@swc/cli": "^0.4.0",
 		"@swc/core": "^1.7.42",
+		"@types/bcrypt": "^6.0.0",
 		"@types/fs-extra": "^11.0.4",
 		"@types/joi": "^17.2.3",
 		"@types/node": "^22.8.7",
