@@ -89,6 +89,35 @@ export class EnvironmentVariables {
 	@IsNumber()
 	THROTTLER_MEDIUM_LIMIT = 100
 
+	// OTP
+	@IsOptional()
+	@IsNumber()
+	OTP_MAX_ATTEMPTS = 3
+
+	@IsOptional()
+	@IsNumber()
+	OTP_MAX_RESEND_COUNT = 5
+
+	@IsOptional()
+	@IsNumber()
+	OTP_EXPIRY_MINUTES = 10
+
+	@IsOptional()
+	@IsNumber()
+	OTP_BLOCK_DURATION_MINUTES = 15
+
+	@IsOptional()
+	@IsNumber()
+	OTP_RESEND_COOLDOWN_SECONDS = 60
+
+	@IsOptional()
+	@IsNumber()
+	OTP_RATE_LIMIT_MAX = 5
+
+	@IsOptional()
+	@IsNumber()
+	OTP_RATE_LIMIT_WINDOW_SECONDS = 900
+
 	// Security
 	@IsOptional()
 	@IsString()
@@ -110,6 +139,13 @@ export function validate(config: Record<string, unknown>) {
 		'THROTTLER_SHORT_LIMIT',
 		'THROTTLER_MEDIUM_TTL',
 		'THROTTLER_MEDIUM_LIMIT',
+		'OTP_MAX_ATTEMPTS',
+		'OTP_MAX_RESEND_COUNT',
+		'OTP_EXPIRY_MINUTES',
+		'OTP_BLOCK_DURATION_MINUTES',
+		'OTP_RESEND_COOLDOWN_SECONDS',
+		'OTP_RATE_LIMIT_MAX',
+		'OTP_RATE_LIMIT_WINDOW_SECONDS',
 	]
 	const booleanKeys = ['DB_SYNCHRONIZE', 'DB_LOGGING']
 

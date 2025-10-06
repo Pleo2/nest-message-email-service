@@ -2,6 +2,7 @@ import type { RedisClientType } from 'redis'
 
 import * as crypto from 'node:crypto'
 
+import { InjectRedis } from '@nestjs-redis/kit'
 import {
 	BadRequestException,
 	HttpException,
@@ -12,7 +13,6 @@ import {
 } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { InjectRepository } from '@nestjs/typeorm'
-import { InjectRedis } from '@nestjs-redis/kit'
 import * as bcrypt from 'bcrypt'
 import { LessThan, MoreThan, Repository } from 'typeorm'
 
@@ -48,7 +48,7 @@ export class OtpService {
 	private MAX_RESEND_COUNT = 5
 	private BLOCK_DURATION_MINUTES = 15
 	private RESEND_COOLDOWN_SECONDS = 60
-	private DEFAULT_EXPIRY_MINUTES = 10
+	private DEFAULT_EXPIRY_MINUTES!: number
 	private readonly BCRYPT_ROUNDS = 12
 	private RATE_LIMIT_MAX = 5
 	private RATE_LIMIT_WINDOW_SECONDS = 900
@@ -64,34 +64,36 @@ export class OtpService {
 	}
 
 	private initializeConfig(): void {
-		const maxAttempts = this.configService.get<number>('OTP_MAX_ATTEMPTS')
-		const maxResend = this.configService.get<number>('OTP_MAX_RESEND_COUNT')
-		const expiryMinutes =
-			this.configService.get<number>('OTP_EXPIRY_MINUTES')
-		const blockDuration = this.configService.get<number>(
-			'OTP_BLOCK_DURATION_MINUTES',
-		)
-		const resendCooldown = this.configService.get<number>(
-			'OTP_RESEND_COOLDOWN_SECONDS',
-		)
-		const rateLimitMax =
-			this.configService.get<number>('OTP_RATE_LIMIT_MAX')
-		const rateLimitWindow = this.configService.get<number>(
-			'OTP_RATE_LIMIT_WINDOW_SECONDS',
-		)
+		const getNumberConfig = (key: string, fallback: number): number => {
+			const value = this.configService.get<number | undefined>(key)
+			return typeof value === 'number' ? value : fallback
+		}
 
-		// Aplicar valores solo si son números válidos
-		if (typeof maxAttempts === 'number') this.MAX_ATTEMPTS = maxAttempts
-		if (typeof maxResend === 'number') this.MAX_RESEND_COUNT = maxResend
-		if (typeof expiryMinutes === 'number')
-			this.DEFAULT_EXPIRY_MINUTES = expiryMinutes
-		if (typeof blockDuration === 'number')
-			this.BLOCK_DURATION_MINUTES = blockDuration
-		if (typeof resendCooldown === 'number')
-			this.RESEND_COOLDOWN_SECONDS = resendCooldown
-		if (typeof rateLimitMax === 'number') this.RATE_LIMIT_MAX = rateLimitMax
-		if (typeof rateLimitWindow === 'number')
-			this.RATE_LIMIT_WINDOW_SECONDS = rateLimitWindow
+		this.MAX_ATTEMPTS = getNumberConfig(
+			'OTP_MAX_ATTEMPTS',
+			this.MAX_ATTEMPTS,
+		)
+		this.MAX_RESEND_COUNT = getNumberConfig(
+			'OTP_MAX_RESEND_COUNT',
+			this.MAX_RESEND_COUNT,
+		)
+		this.DEFAULT_EXPIRY_MINUTES = getNumberConfig('OTP_EXPIRY_MINUTES', 10)
+		this.BLOCK_DURATION_MINUTES = getNumberConfig(
+			'OTP_BLOCK_DURATION_MINUTES',
+			this.BLOCK_DURATION_MINUTES,
+		)
+		this.RESEND_COOLDOWN_SECONDS = getNumberConfig(
+			'OTP_RESEND_COOLDOWN_SECONDS',
+			this.RESEND_COOLDOWN_SECONDS,
+		)
+		this.RATE_LIMIT_MAX = getNumberConfig(
+			'OTP_RATE_LIMIT_MAX',
+			this.RATE_LIMIT_MAX,
+		)
+		this.RATE_LIMIT_WINDOW_SECONDS = getNumberConfig(
+			'OTP_RATE_LIMIT_WINDOW_SECONDS',
+			this.RATE_LIMIT_WINDOW_SECONDS,
+		)
 
 		this.logger.log(
 			`OTP Service initialized: MAX_ATTEMPTS=${this.MAX_ATTEMPTS}, MAX_RESEND=${this.MAX_RESEND_COUNT}, EXPIRY=${this.DEFAULT_EXPIRY_MINUTES}min`,

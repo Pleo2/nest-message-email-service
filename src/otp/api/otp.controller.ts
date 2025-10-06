@@ -1,4 +1,3 @@
-// src/modules/otp/otp.controller.ts
 import {
 	Body,
 	Controller,
