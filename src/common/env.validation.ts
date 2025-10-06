@@ -71,6 +71,14 @@ export class EnvironmentVariables {
 
 	@IsNumber()
 	REDIS_DB = 0
+
+    // Security
+    @IsOptional()
+    @IsString()
+    ALLOWED_APPLICATIONS?: string // Comma-separated list of allowed application IDs
+
+    @IsString()
+    ADMIN_API_KEY!: string // API Key for admin endpoints
 }
 
 export function validate(config: Record<string, unknown>) {
