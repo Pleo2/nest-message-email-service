@@ -1,6 +1,7 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core'
+import { ThrottlerModule } from '@nestjs/throttler'
 
 import { OtpModule } from '@/src/otp'
 
@@ -42,10 +43,31 @@ const coreImports = [
 	UserModule,
 ]
 
+const throttlerImports = isTest
+	? [
+			ThrottlerModule.forRoot([
+				{
+					name: 'short',
+					ttl: 1000,
+					limit: 3,
+				},
+				{
+					name: 'medium',
+					ttl: 60_000,
+					limit: 100,
+				},
+			]),
+		]
+	: throttlerRedisImports
+
 @Module({
-	imports: isTest
-		? coreImports
-		: [...coreImports, ...databaseImports, ...redisImports, ...throttlerRedisImports, OtpModule],
+	imports: [
+		...coreImports,
+		...(isTest ? [] : databaseImports),
+		...(isTest ? [] : redisImports),
+		...throttlerImports,
+		...(isTest ? [] : [OtpModule]),
+	],
 	providers: [
 		{
 			provide: APP_GUARD,
