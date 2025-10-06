@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler'
 
@@ -12,6 +12,8 @@ import { databaseImports } from '../config/database/database.imports'
 import { OtpModule } from '@/src/otp'
 import { redisImports } from '../config/redis/redis.imports'
 import { APP_GUARD } from '@nestjs/core'
+import { ApplicationValidationGuard } from '../guards'
+import { LoggerMiddleware } from '../common/logger.middleware'
 
 const isTest = process.env.NODE_ENV === 'test'
 
@@ -58,6 +60,15 @@ const coreImports = [
 			provide: APP_GUARD,
 			useClass: ThrottlerGuard, // ← Global guard
 		},
+        // ApplicationValidationGuard global
+		{
+			provide: APP_GUARD,
+			useClass: ApplicationValidationGuard,
+		},
     ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+	configure(consumer: MiddlewareConsumer) {
+		consumer.apply(LoggerMiddleware).forRoutes('*')
+	}
+}

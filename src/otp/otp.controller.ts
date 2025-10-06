@@ -12,8 +12,10 @@ import {
 } from '@nestjs/common'
 import {
 	ApiBadRequestResponse,
+	ApiHeader,
 	ApiOkResponse,
 	ApiOperation,
+	ApiSecurity,
 	ApiTags,
 	ApiTooManyRequestsResponse,
 } from '@nestjs/swagger'
@@ -32,7 +34,16 @@ import {
 	VerifyOtpDto,
 	VerifyOtpResponseDto,
 } from './dto'
+
+// Guards
+import { ApiKeyGuard } from '../guards'
+
+// Decorators
+import { Public, SkipAppValidation } from '../decorators'
+
+// Services
 import { OtpService } from './otp.service'
+import { OtpCronService } from './otp.cron'
 
 /**
  * OTP Controller
@@ -46,14 +57,15 @@ import { OtpService } from './otp.service'
  */
 @ApiTags('OTP Authentication')
 @Controller('api/otp')
-@UseGuards(ThrottlerGuard)
+@UseGuards(ThrottlerGuard, ApiKeyGuard)
 export class OtpController {
-	constructor(private readonly otpService: OtpService) {}
+	constructor(private readonly otpService: OtpService, private readonly otpCronService: OtpCronService) {}
 
 	/**
 	 * Generar y enviar un nuevo OTP
 	 */
 	@Post('generate')
+    @Public()
 	@HttpCode(HttpStatus.OK)
 	@ApiOperation({
 		summary: 'Generate and send OTP',
@@ -83,6 +95,7 @@ export class OtpController {
 	 * Verificar un código OTP
 	 */
 	@Post('verify')
+    @Public()
 	@HttpCode(HttpStatus.OK)
 	@ApiOperation({
 		summary: 'Verify OTP code',
@@ -112,6 +125,7 @@ export class OtpController {
 	 * Reenviar un OTP
 	 */
 	@Post('resend')
+    @Public()
 	@HttpCode(HttpStatus.OK)
 	@ApiOperation({
 		summary: 'Resend OTP code',
@@ -137,16 +151,28 @@ export class OtpController {
 		return this.otpService.resendOtp(resendOtpDto, ip)
 	}
 
+    // ============================================================================
+	// ENDPOINTS ADMIN (requieren API Key)
+	// ============================================================================
+
 	/**
-	 * Obtener estadísticas del servicio OTP (Admin)
+	 * Obtener estadísticas
 	 */
 	@Get('stats')
+	@SkipAppValidation() // No requiere applicationId en body
 	@HttpCode(HttpStatus.OK)
 	@ApiOperation({
 		summary: 'Get OTP statistics',
 		description:
-			'Retrieves statistical information about OTP usage. Can be filtered by application ID.',
+			'Admin endpoint. Retrieves statistical information about OTP usage. Can be filtered by applicationId.',
 	})
+	@ApiHeader({
+		name: 'X-API-Key',
+		description: 'Admin API Key',
+		required: true,
+		example: 'your-api-key-here',
+	})
+	@ApiSecurity('X-API-Key')
 	@ApiOkResponse({
 		description: 'Statistics retrieved successfully',
 		type: OtpStatisticsResponseDto,
@@ -156,22 +182,97 @@ export class OtpController {
 	): Promise<OtpStatisticsResponseDto> {
 		return this.otpService.getStatistics(query.applicationId)
 	}
-
 	/**
-	 * Limpiar OTPs expirados (Admin)
+	 * Limpiar OTPs expirados
 	 */
 	@Post('cleanup')
+	@SkipAppValidation()
 	@HttpCode(HttpStatus.OK)
 	@ApiOperation({
 		summary: 'Clean up expired OTPs',
 		description:
-			'Manually triggers cleanup of expired OTPs from database and cache.',
+			'Admin endpoint. Manually triggers cleanup of expired OTPs from Redis. Database records are preserved.',
 	})
+	@ApiHeader({
+		name: 'X-API-Key',
+		description: 'Admin API Key',
+		required: true,
+	})
+	@ApiSecurity('X-API-Key')
 	@ApiOkResponse({
 		description: 'Cleanup completed successfully',
 		type: CleanupResponseDto,
 	})
 	async cleanupExpired(): Promise<CleanupResponseDto> {
 		return this.otpService.cleanupExpiredOtps()
+	}
+    /**
+	 * Sincronizar Redis desde DB
+	 */
+	@Post('sync-redis')
+	@SkipAppValidation()
+	@HttpCode(HttpStatus.OK)
+	@ApiOperation({
+		summary: 'Sync Redis from database',
+		description:
+			'Admin endpoint. Rebuilds Redis cache from active OTPs in database. Useful after Redis restart.',
+	})
+	@ApiHeader({
+		name: 'X-API-Key',
+		description: 'Admin API Key',
+		required: true,
+	})
+	@ApiSecurity('X-API-Key')
+	@ApiOkResponse({
+		description: 'Sync completed successfully',
+	})
+	async syncRedis(): Promise<{ success: boolean; syncedCount: number }> {
+		const syncedCount =
+			await this.otpCronService.syncRedisFromDatabase()
+		return {
+			success: true,
+			syncedCount,
+		}
+	}
+
+	/**
+	 * Cleanup manual de Redis
+	 */
+	@Post('cleanup/manual')
+	@SkipAppValidation()
+	@HttpCode(HttpStatus.OK)
+	@ApiOperation({
+		summary: 'Trigger manual Redis cleanup',
+		description:
+			'Admin endpoint. Manually triggers Redis cleanup without waiting for scheduled cron job.',
+	})
+	@ApiHeader({
+		name: 'X-API-Key',
+		description: 'Admin API Key',
+		required: true,
+	})
+	@ApiSecurity('X-API-Key')
+	async manualCleanup() {
+		return this.otpCronService.triggerManualCleanup()
+	}
+
+	/**
+	 * Ver estado de cron jobs
+	 */
+	@Get('cron/status')
+	@SkipAppValidation()
+	@ApiOperation({
+		summary: 'Get cron jobs status',
+		description:
+			'Admin endpoint. Returns the status of all scheduled cron jobs including last and next execution times.',
+	})
+	@ApiHeader({
+		name: 'X-API-Key',
+		description: 'Admin API Key',
+		required: true,
+	})
+	@ApiSecurity('X-API-Key')
+	async getCronStatus() {
+		return this.otpCronService.getCronJobsStatus()
 	}
 }

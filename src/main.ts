@@ -34,11 +34,56 @@ async function bootstrap() {
 	)
 
 	const config = new DocumentBuilder()
-		.setTitle('nestjs-template')
-		.setDescription('nestjs-template API description')
+		.setTitle('OTP Authentication Microservice')
+		.setDescription(
+			`
+## Secure OTP-based authentication API
+
+### Features
+- Email and SMS OTP delivery
+- Rate limiting and cooldown protection
+- Multi-application support
+- Redis caching for performance
+- Admin endpoints protected with API Key
+
+### Authentication
+- **Public endpoints**: No authentication required (generate, verify, resend)
+- **Admin endpoints**: Require API Key via \`X-API-Key\` header
+
+### Usage
+1. Generate OTP: \`POST /api/otp/generate\`
+2. User receives OTP via email/SMS
+3. Verify OTP: \`POST /api/otp/verify\`
+4. Get session token on success
+
+### Admin Endpoints
+Protected with API Key. Set \`X-API-Key\` header with your admin key.
+		`,
+		)
 		.setVersion('1.0')
-		.addTag('nestjs-template')
+		.addTag('OTP Authentication', 'Public OTP generation and verification')
+		.addTag('Admin', 'Admin endpoints (require API Key)')
+		.addApiKey(
+			{
+				type: 'apiKey',
+				name: 'X-API-Key',
+				in: 'header',
+				description: 'Admin API Key for protected endpoints',
+			},
+			'X-API-Key',
+		)
+		.addServer('http://localhost:3000', 'Development')
+		.addServer('https://api.production.com', 'Production')
 		.build()
+
+	const document = SwaggerModule.createDocument(app, config)
+	SwaggerModule.setup('api/docs', app, document, {
+		swaggerOptions: {
+			persistAuthorization: true,
+			tagsSorter: 'alpha',
+			operationsSorter: 'alpha',
+		},
+	})
 
 	const documentFactory = () => SwaggerModule.createDocument(app, config)
 	SwaggerModule.setup(
