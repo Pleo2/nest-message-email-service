@@ -37,6 +37,14 @@ describe('Health', () => {
 	it('/GET health', async () => {
 		const response = await request(app.getHttpServer()).get('/health')
 		expect(response.status).toBe(200)
-		expect(response.body).toEqual({ status: 'ok' })
+		expect(response.body).toEqual({
+			success: true,
+			data: { status: 'ok' },
+			timestamp: expect.any(String),
+			path: '/health',
+			method: 'GET',
+			statusCode: 200,
+			requestId: expect.any(String),
+		})
 	})
 })
