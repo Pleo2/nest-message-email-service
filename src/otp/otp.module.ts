@@ -1,16 +1,17 @@
 // src/modules/otp/otp.module.ts
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
+import { ScheduleModule } from '@nestjs/schedule'
 import { ThrottlerModule } from '@nestjs/throttler'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { ScheduleModule } from '@nestjs/schedule'
 
 import { redisImports } from '@/src/config/redis/redis.imports'
 
 import { OtpEntity } from './entities/otp.entity'
-import { OtpController } from './otp.controller'
-import { OtpService } from './otp.service'
+import { OtpStatsCacheInterceptor } from './interceptors/otp-stats-cache.interceptor'
+import { OtpController } from './api/otp.controller'
 import { OtpCronService } from './otp.cron'
+import { OtpService } from './otp.service'
 
 /**
  * OTP Module
@@ -44,7 +45,7 @@ import { OtpCronService } from './otp.cron'
 		ConfigModule,
 	],
 	controllers: [OtpController],
-	providers: [OtpService, OtpCronService],
+	providers: [OtpService, OtpCronService, OtpStatsCacheInterceptor],
 	exports: [OtpService],
 })
 export class OtpModule {}

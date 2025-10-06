@@ -34,19 +34,19 @@ import {
 	ValidationErrorDto,
 	VerifyOtpDto,
 	VerifyOtpResponseDto,
-} from './dto'
+} from '../dto'
 
 // Guards
-import { ApiKeyGuard } from '../guards'
+import { ApiKeyGuard } from '../../guards'
 
 // Decorators
-import { Public, SkipAppValidation } from '../decorators'
+import { Public, SkipAppValidation } from '../../decorators'
 
 // Services
-import { OtpStatsCacheInterceptor } from './interceptors/otp-stats-cache.interceptor'
-import { OtpCronService } from './otp.cron'
-import { OtpService } from './otp.service'
-import { TimeoutInterceptor } from '../interceptors'
+import { OtpStatsCacheInterceptor } from '../interceptors/otp-stats-cache.interceptor'
+import { OtpCronService } from '../otp.cron'
+import { OtpService } from '../otp.service'
+import { TimeoutInterceptor } from '../../interceptors'
 
 /**
  * OTP Controller

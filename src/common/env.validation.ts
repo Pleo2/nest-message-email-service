@@ -72,19 +72,45 @@ export class EnvironmentVariables {
 	@IsNumber()
 	REDIS_DB = 0
 
-    // Security
-    @IsOptional()
-    @IsString()
-    ALLOWED_APPLICATIONS?: string // Comma-separated list of allowed application IDs
+	// Throttler
+	@IsOptional()
+	@IsNumber()
+	THROTTLER_SHORT_TTL = 1000
 
-    @IsString()
-    ADMIN_API_KEY!: string // API Key for admin endpoints
+	@IsOptional()
+	@IsNumber()
+	THROTTLER_SHORT_LIMIT = 3
+
+	@IsOptional()
+	@IsNumber()
+	THROTTLER_MEDIUM_TTL = 60000
+
+	@IsOptional()
+	@IsNumber()
+	THROTTLER_MEDIUM_LIMIT = 100
+
+	// Security
+	@IsOptional()
+	@IsString()
+	ALLOWED_APPLICATIONS?: string // Comma-separated list of allowed application IDs
+
+	@IsString()
+	ADMIN_API_KEY!: string // API Key for admin endpoints
 }
 
 export function validate(config: Record<string, unknown>) {
 	// Coerce common numeric and boolean environment variables (env files provide strings)
 	const processedConfig: Record<string, unknown> = { ...config }
-	const numericKeys = ['PORT', 'DB_PORT', 'REDIS_PORT', 'REDIS_DB']
+	const numericKeys = [
+		'PORT',
+		'DB_PORT',
+		'REDIS_PORT',
+		'REDIS_DB',
+		'THROTTLER_SHORT_TTL',
+		'THROTTLER_SHORT_LIMIT',
+		'THROTTLER_MEDIUM_TTL',
+		'THROTTLER_MEDIUM_LIMIT',
+	]
 	const booleanKeys = ['DB_SYNCHRONIZE', 'DB_LOGGING']
 
 	for (const key of numericKeys) {
