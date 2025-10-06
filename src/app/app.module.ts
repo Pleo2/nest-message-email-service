@@ -10,6 +10,7 @@ import { validate } from '../common/env.validation'
 import configuration from '../config/configuration'
 import { databaseImports } from '../config/database/database.imports'
 import { OtpModule } from '@/src/otp'
+import { redisImports } from '../config/redis/redis.imports'
 
 const isTest = process.env.NODE_ENV === 'test'
 
@@ -39,6 +40,6 @@ const coreImports = [
 @Module({
 	imports: isTest
 		? coreImports
-		: [...coreImports, ...databaseImports, OtpModule],
+		: [...coreImports, ...databaseImports, ...redisImports, OtpModule],
 })
 export class AppModule {}
