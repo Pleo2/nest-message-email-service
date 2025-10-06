@@ -782,13 +782,13 @@ curl -X POST http://localhost:3000/api/otp/sync-redis \
 
 ## <a id="proximas-mejoras"></a>🎯 Próximas mejoras
 
-- [ ] Integración con proveedores de email (SendGrid, Resend, Doppler).
-- [ ] Integración con proveedores de SMS (Twilio, Mesangi).
-- [ ] WebSockets para notificaciones en tiempo real.
-- [ ] Dashboard admin con métricas.
+- [ ] Integración con proveedores de email (SendGrid, Resend, Doppler). (fase 1)
+- [ ] Integración con proveedores de SMS (Twilio, Mesangi). (fase 1)
+- [ ] WebSockets para notificaciones en tiempo real. (fase 2)
+- [ ] Dashboard admin con métricas. (fase 2)
+- [ ] CI/CD pipeline. (fase 1)
+- [ ] Kubernetes deployment. (fase 1)
 - [ ] Tests E2E completos.
-- [ ] CI/CD pipeline.
-- [ ] Kubernetes deployment.
 - [ ] Observabilidad con Grafana/Prometheus.
 
 ---
