@@ -9,6 +9,7 @@ import {
 	Post,
 	Query,
 	UseGuards,
+	UseInterceptors,
 } from '@nestjs/common'
 import {
 	ApiBadRequestResponse,
@@ -42,8 +43,10 @@ import { ApiKeyGuard } from '../guards'
 import { Public, SkipAppValidation } from '../decorators'
 
 // Services
-import { OtpService } from './otp.service'
+import { OtpStatsCacheInterceptor } from './interceptors/otp-stats-cache.interceptor'
 import { OtpCronService } from './otp.cron'
+import { OtpService } from './otp.service'
+import { TimeoutInterceptor } from '../interceptors'
 
 /**
  * OTP Controller
@@ -59,13 +62,17 @@ import { OtpCronService } from './otp.cron'
 @Controller('api/otp')
 @UseGuards(ThrottlerGuard, ApiKeyGuard)
 export class OtpController {
-	constructor(private readonly otpService: OtpService, private readonly otpCronService: OtpCronService) {}
+	constructor(
+		private readonly otpService: OtpService,
+		private readonly otpCronService: OtpCronService,
+	) {}
 
 	/**
 	 * Generar y enviar un nuevo OTP
 	 */
 	@Post('generate')
-    @Public()
+    @UseInterceptors(new TimeoutInterceptor(5000))
+	@Public()
 	@HttpCode(HttpStatus.OK)
 	@ApiOperation({
 		summary: 'Generate and send OTP',
@@ -95,7 +102,8 @@ export class OtpController {
 	 * Verificar un código OTP
 	 */
 	@Post('verify')
-    @Public()
+    @UseInterceptors(new TimeoutInterceptor(5000))
+	@Public()
 	@HttpCode(HttpStatus.OK)
 	@ApiOperation({
 		summary: 'Verify OTP code',
@@ -125,7 +133,8 @@ export class OtpController {
 	 * Reenviar un OTP
 	 */
 	@Post('resend')
-    @Public()
+    @UseInterceptors(new TimeoutInterceptor(5000))
+	@Public()
 	@HttpCode(HttpStatus.OK)
 	@ApiOperation({
 		summary: 'Resend OTP code',
@@ -151,7 +160,7 @@ export class OtpController {
 		return this.otpService.resendOtp(resendOtpDto, ip)
 	}
 
-    // ============================================================================
+	// ============================================================================
 	// ENDPOINTS ADMIN (requieren API Key)
 	// ============================================================================
 
@@ -159,6 +168,7 @@ export class OtpController {
 	 * Obtener estadísticas
 	 */
 	@Get('stats')
+	@UseInterceptors(OtpStatsCacheInterceptor)
 	@SkipAppValidation() // No requiere applicationId en body
 	@HttpCode(HttpStatus.OK)
 	@ApiOperation({
@@ -206,7 +216,7 @@ export class OtpController {
 	async cleanupExpired(): Promise<CleanupResponseDto> {
 		return this.otpService.cleanupExpiredOtps()
 	}
-    /**
+	/**
 	 * Sincronizar Redis desde DB
 	 */
 	@Post('sync-redis')
@@ -227,8 +237,7 @@ export class OtpController {
 		description: 'Sync completed successfully',
 	})
 	async syncRedis(): Promise<{ success: boolean; syncedCount: number }> {
-		const syncedCount =
-			await this.otpCronService.syncRedisFromDatabase()
+		const syncedCount = await this.otpCronService.syncRedisFromDatabase()
 		return {
 			success: true,
 			syncedCount,
