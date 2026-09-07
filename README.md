@@ -142,15 +142,15 @@ Servicio de autenticación basado en OTP (One-Time Password) construido con Nest
 
 | Tecnología          | Versión | Propósito                              |
 | ------------------- | ------- | -------------------------------------- |
-| **NestJS**          | 10.x    | Framework backend                      |
+| **NestJS**          | 11.x    | Framework backend                      |
 | **TypeScript**      | 5.x     | Lenguaje tipado                        |
-| **Fastify**         | 4.x     | Servidor HTTP (más rápido que Express) |
+| **Fastify**         | 5.x     | Servidor HTTP (más rápido que Express) |
 | **PostgreSQL**      | 15+     | Base de datos relacional               |
 | **TypeORM**         | 0.3.x   | ORM con migraciones                    |
 | **Redis**           | 7+      | Cache y rate limiting                  |
-| **Bcrypt**          | 5.x     | Hash de OTPs                           |
+| **Bcrypt**          | 6.x     | Hash de OTPs                           |
 | **class-validator** | 0.14.x  | Validación de DTOs                     |
-| **@nestjs/swagger** | 7.x     | Documentación OpenAPI                  |
+| **@nestjs/swagger** | 11.x    | Documentación OpenAPI                  |
 
 ---
 
